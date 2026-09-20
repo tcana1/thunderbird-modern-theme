@@ -1,0 +1,347 @@
+/* ==========================================================================
+   Thunderbird Modern Theme
+   A flat, Spark-inspired userChrome.css. Tested on Thunderbird 156 (macOS).
+   Requires the Cards View and toolkit.legacyUserProfileCustomizations.stylesheets
+   set to true. Looks best with View > Folders > Folder Pane Header turned off.
+   See README.md.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   Theme colors
+   Adjust them here.
+   ========================================================================== */
+
+:root {
+    --spark-sidebar-bg: #14264a;      /* dark blue sidebar */
+    --spark-sidebar-text: #ffffff;
+    --spark-toolbar-bg: var(--spark-sidebar-bg);   /* top toolbar: same blue as the sidebar */
+    --spark-blue: #1a8cff;            /* unread dot / accents */
+}
+
+
+/* --------------------------------------------------------------------------
+   1. Sidebar: dark blue, white text
+   -------------------------------------------------------------------------- */
+
+#folderPane {
+    color-scheme: dark;
+    background-color: var(--spark-sidebar-bg) !important;
+    color: var(--spark-sidebar-text) !important;
+    --sidebar-border: rgba(255, 255, 255, 0.12);
+    --layout-color-3: rgba(255, 255, 255, 0.6);          /* folder size */
+    --new-folder-color: #8cc0ff;                         /* folder with new messages */
+
+    /* unread badge: flat blue */
+    --folderpane-unread-count-background: var(--spark-blue);
+    --folderpane-unread-count-text: #ffffff;
+
+    /* hover / selection: no borders, just a light veil */
+    --list-container-border: transparent;
+    --list-container-border-hover: transparent;
+    --list-container-border-selected: transparent;
+    --list-container-border-selected-current: transparent;
+    --list-container-border-selected-focused: transparent;
+    --list-container-border-selected-current-focused: transparent;
+    --list-container-background-hover: rgba(255, 255, 255, 0.08);
+    --list-container-background-selected: rgba(255, 255, 255, 0.12);
+    --list-container-background-selected-current: rgba(255, 255, 255, 0.16);
+    --list-container-background-selected-focused: rgba(255, 255, 255, 0.14);
+    --list-container-background-selected-current-focused: rgba(255, 255, 255, 0.20);
+}
+
+/* Small, gray, barely visible chevron */
+#folderTree .twisty {
+    inline-size: 14px !important;
+}
+
+#folderTree .twisty-icon {
+    inline-size: 8px !important;
+    block-size: 8px !important;
+    fill: rgba(255, 255, 255, 0.3) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   2. Sidebar: no folder icons
+      (the icon is kept only while a folder is syncing or has an error)
+   -------------------------------------------------------------------------- */
+
+#folderTree li:not([data-is-busy="true"]):not([data-has-error="true"]) > .container > .icon,
+#folderTree .container > .new-icon {
+    display: none !important;
+}
+
+#folderTree .name {
+    margin-inline-start: 2px !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Sidebar: no gap between the edge and the folders
+   -------------------------------------------------------------------------- */
+
+#folderTree .container {
+    margin-inline: 0 !important;
+    border-radius: 0 !important;
+    padding-inline-start: calc(var(--indent) + 6px) !important;
+}
+
+#folderTree li[data-mode] {
+    margin-block-end: 0 !important;
+}
+
+/* Account color bar (shown on folders inside Unified Folders): pinned near the
+   left edge of the row instead of sitting next to the name.
+   Change inset-inline-start to move it (0 = flush with the edge). */
+#folderTree .container > .account-indicator {
+    position: absolute !important;
+    inset-inline-start: 24px !important;
+    inset-block: 7px !important;
+    block-size: auto !important;
+    margin: 0 !important;
+    border-radius: 3px !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   4. Message list: cards edge to edge, separated by a thin line
+   -------------------------------------------------------------------------- */
+
+#threadTree[rows="thread-card"] {
+    padding-block: 0 !important;
+}
+
+#threadTree[rows="thread-card"] tbody > .card-layout > td {
+    padding-block: 0 !important;
+    padding-inline-end: 0 !important;
+}
+
+/* regular message cards (conversation replies keep their own indent) */
+#threadTree[rows="thread-card"] tbody > .card-layout:not([data-properties~="thread-children"]) > td {
+    padding-inline-start: 0 !important;
+}
+
+#threadTree[rows="thread-card"] tbody > .card-layout > td > .card-container {
+    border-radius: 0 !important;
+    border-style: solid !important;
+    border-width: 0 0 1px 0 !important;
+    border-color: var(--layout-border-0) !important;
+}
+
+/* the side padding that used to come from the td now lives inside the card */
+#threadTree[rows="thread-card"] tbody > .card-layout:not([data-properties~="thread-children"]) > td > .card-container {
+    padding-inline-start: 10px !important;
+    padding-inline-end: calc(10px + env(scrollbar-inline-size)) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   5. Unread dot: flat blue
+   -------------------------------------------------------------------------- */
+
+#threadTree[rows="thread-card"] .card-layout[data-properties~="unread"],
+#threadTree[rows="thread-card"] .card-layout[data-properties~="unread"][data-properties~="new"] {
+    --read-status-icon: var(--icon-dot) !important;
+    --read-status-fill: var(--spark-blue) !important;
+    --read-status-stroke: var(--spark-blue) !important;
+}
+
+/* "has unread" marker on the conversation button (was green) */
+#threadTree[rows="thread-card"] .card-layout[data-properties~="hasUnread"] button.twisty::before {
+    fill: var(--spark-blue) !important;
+    stroke: var(--spark-blue) !important;
+}
+
+/* Table View, in case you switch to it */
+tr[data-properties~="unread"] .tree-view-row-unread > .tree-button-unread > img {
+    fill: var(--spark-blue) !important;
+    stroke: var(--spark-blue) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   6. Top toolbar (#unifiedToolbarContainer)
+   -------------------------------------------------------------------------- */
+
+#unifiedToolbarContainer {
+    color-scheme: dark;
+    background-color: var(--spark-toolbar-bg) !important;
+    color: var(--spark-sidebar-text) !important;
+
+    /* buttons: flat, with a translucent white veil instead of the default gray */
+    --button-background-color: transparent;
+    --button-background-color-hover: rgba(255, 255, 255, 0.14);
+    --button-hover-background-color: rgba(255, 255, 255, 0.14);
+    --button-background-color-active: rgba(255, 255, 255, 0.22);
+    --button-active-background-color: rgba(255, 255, 255, 0.22);
+    --button-border-color: transparent;
+    --button-text-color: var(--spark-sidebar-text);
+    --button-hover-text-color: var(--spark-sidebar-text);
+
+    /* search field: translucent, white text */
+    --search-bar-color: var(--spark-sidebar-text);
+    --search-bar-background: rgba(255, 255, 255, 0.12);
+    --search-bar-focus-background: rgba(255, 255, 255, 0.18);
+    --search-bar-border-color: transparent;
+    --search-field-placeholder: rgba(255, 255, 255, 0.55);
+}
+
+/* subtle bottom line, instead of the default dark border */
+unified-toolbar {
+    border-block-end-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   7. Toolbar fixes
+   -------------------------------------------------------------------------- */
+
+/* Light line between the toolbar and the content (default toolbox separator) */
+.mail-toolbox,
+#navigation-toolbox {
+    box-shadow: none !important;
+    border-block-end: none !important;
+}
+
+unified-toolbar {
+    border-block-end: none !important;
+}
+
+/* Gray band above the sidebar: make sure the blue is behind everything */
+body:is(.layout-classic, .layout-vertical, .layout-wide, .account-central) {
+    background-color: var(--spark-sidebar-bg);
+}
+
+#folderTree,
+#folderTree > li {
+    background-color: transparent !important;
+}
+
+/* macOS red/yellow/green window buttons: the light scheme makes them lighter */
+.titlebar-buttonbox-container,
+.titlebar-buttonbox {
+    color-scheme: light !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   8. Gray band at the top of the sidebar
+      #folderTree (.sidebar-panel-scroll) has a 4px ::after that uses
+      --sidebar-background, which turned into #27272a under color-scheme: dark.
+   -------------------------------------------------------------------------- */
+
+#folderPane {
+    --sidebar-background: var(--spark-sidebar-bg);
+}
+
+#folderTree::before {
+    display: none !important;   /* 15% black shadow at the top of the list */
+}
+
+#folderTree::after {
+    background-color: var(--spark-sidebar-bg) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Unified Folders
+      Hide the "Unified Folders" title. Trash and account rows get no unread
+      count and are never bold.
+   -------------------------------------------------------------------------- */
+
+/* :not([hidden]) leaves Thunderbird's own hiding logic untouched */
+li[data-mode="smart"] > .mode-container:not([hidden]) {
+    display: none !important;
+}
+
+li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .unread-count,
+li[data-mode="smart"] > ul > li[data-server-type] > .container > .unread-count {
+    display: none !important;
+}
+
+li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name,
+li[data-mode="smart"] > ul > li[data-server-type] > .container > .name {
+    font-weight: normal !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   10. "All Folders" pinned to the bottom of the pane
+   -------------------------------------------------------------------------- */
+
+/* the tree fills the whole pane height (it used to be only as tall as its content) */
+#folderTree {
+    flex: 1 1 auto !important;
+    min-block-size: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* sections don't shrink: if space runs out, the tree scrolls as usual */
+#folderTree > li[data-mode] {
+    flex: 0 0 auto !important;
+}
+
+/* an auto margin pushes "All Folders" to the floor */
+#folderTree > li[data-mode="all"] {
+    margin-block-start: auto !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   11. Message header: "From Name" on a single line, without the avatar
+       Works regardless of the "Show recipient avatar" and "Show sender full
+       address" options in Customize Header.
+   -------------------------------------------------------------------------- */
+
+/* no avatar */
+#expandedfromBox .recipient-avatar {
+    display: none !important;
+}
+
+/* single line, instead of the name stacked over the address. Whether it shows
+   the name only or "Name <address>" is Thunderbird's own setting
+   (mail.showCondensedAddresses) */
+#expandedfromBox .recipient-multi-line {
+    display: none !important;
+}
+
+#expandedfromBox .recipient-single-line {
+    display: inline !important;
+}
+
+/* the old "From" label of the row is hidden; the heading below replaces it */
+#expandedfromLabel {
+    display: none !important;
+}
+
+/* show the "From" heading (Thunderbird hides #fromHeading by default), in the
+   same style as the "To" and "Cc" headings */
+#expandedfromBox {
+    display: flex !important;
+    align-items: baseline !important;
+}
+
+#expandedfromBox > #fromHeading {
+    display: block !important;
+    flex: none !important;
+    margin-inline-end: 1ch !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    opacity: var(--message-header-label-opacity, 0.7) !important;
+}
+
+#expandedfromBox > .recipients-list {
+    flex: 1 1 auto !important;
+}
+
+/* Align the names in a column:
+     From  Name
+     To    Name
+   Every heading gets the same minimum width. This relies on Customize Header >
+   "Hide labels column" being on (Thunderbird's default), which is what makes
+   the To/Cc/Bcc headings show inline. */
+#messageHeader :is(#fromHeading, #toHeading, #ccHeading, #bccHeading) {
+    min-inline-size: 5ch !important;
+}
