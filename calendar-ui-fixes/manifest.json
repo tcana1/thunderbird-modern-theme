@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Calendar UI Fixes",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Companion to the Thunderbird Modern Theme: side-by-side same-start events, event times and a week-wide now line in the calendar.",
   "browser_specific_settings": {
     "gecko": {

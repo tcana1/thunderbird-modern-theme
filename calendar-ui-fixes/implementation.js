@@ -6,11 +6,15 @@
  * in userChrome.css, so if this extension stops working the theme still looks
  * fine.
  *
- *  1. data-same-start on events that start at the same time, so the CSS can
+ *  1. data-same-start on events that start at (almost) the same time, meaning
+ *     a later one would land on top of the earlier one's text, so the CSS can
  *     lay them out side by side instead of in a cascade.
  *  2. A time label ("14:00 – 18:00") at the top of each event card.
  *  3. The "now" line, which Thunderbird draws only in today's column, is
  *     repeated across every column of the week.
+ *  4. Titles of cards that a later event starts on top of are clamped to the
+ *     lines that fit above that event (data-clamp / --title-lines), so the
+ *     texts don't run into each other.
  */
 
 var { ExtensionCommon } = ChromeUtils.importESModule(
@@ -28,6 +32,8 @@ const DEBOUNCE_MS = 30;
 const SAME_START_ATTR = "data-same-start";
 const SHORT_ATTR = "data-short";
 const NOW_LINE_ATTR = "data-now-line";
+const CLAMP_ATTR = "data-clamp";
+const CLAMP_VAR = "--title-lines";
 const TIME_CLASS = "ui-fixes-time";
 // Cards shorter than this (px) get the time on the same line as the title.
 const SHORT_CARD_PX = 40;
@@ -36,30 +42,6 @@ const VERTICAL_GRID = ".multiday-grid:not(.multiday-grid-rotated)";
 
 // window -> { observer, timer }
 const windows = new Map();
-
-function markSameStart(doc) {
-  for (const list of doc.querySelectorAll("calendar-event-column .multiday-events-list")) {
-    const items = Array.from(list.children);
-    // Only the vertical (Day / Week) layout is handled; the rotated one has no cascade.
-    const rotated = !!list.closest(".multiday-grid-rotated");
-
-    const counts = new Map();
-    for (const item of items) {
-      const start = item.style.insetBlockStart;
-      counts.set(start, (counts.get(start) ?? 0) + 1);
-    }
-
-    for (const item of items) {
-      const start = item.style.insetBlockStart;
-      const shared = !rotated && start && counts.get(start) > 1;
-      if (shared && !item.hasAttribute(SAME_START_ATTR)) {
-        item.setAttribute(SAME_START_ATTR, "true");
-      } else if (!shared && item.hasAttribute(SAME_START_ATTR)) {
-        item.removeAttribute(SAME_START_ATTR);
-      }
-    }
-  }
-}
 
 function timeText(box) {
   const item = box.occurrence;
@@ -130,10 +112,101 @@ function hideNowLine(indicator) {
   indicator.removeAttribute(NOW_LINE_ATTR);
 }
 
+/**
+ * Decide, for the cards of one column, which ones go side by side and how many
+ * title lines the others can show. Pure, so it is easy to reason about.
+ *
+ * @param {{top: number, height: number, need: number}[]} cards - Position and
+ *   height in px, and `need`, the px from the card's top that its time and one
+ *   line of title take.
+ * @returns {{sideBySide: boolean, room: number|null}[]} - `room` is the px
+ *   above the first later card that overlaps this one (null if none).
+ */
+function planCards(cards) {
+  return cards.map(card => {
+    // A neighbour that starts before the earlier card's text is done would
+    // cover it, so those two share the width instead.
+    const sideBySide = cards.some(other => {
+      if (other === card) {
+        return false;
+      }
+      const [first, second] = card.top <= other.top ? [card, other] : [other, card];
+      const gap = second.top - first.top;
+      return gap === 0 || gap < first.need;
+    });
+
+    // Later cards that cascade over this one, past its text.
+    const covers = cards
+      .filter(o => o.top - card.top >= card.need && o.top < card.top + card.height)
+      .map(o => o.top - card.top);
+    return { sideBySide, room: covers.length ? Math.min(...covers) : null };
+  });
+}
+
+function layoutCards(doc) {
+  const view = doc.defaultView;
+
+  for (const list of doc.querySelectorAll("calendar-event-column .multiday-events-list")) {
+    const rotated = !!list.closest(".multiday-grid-rotated");
+    // Nothing to measure while the calendar isn't on screen.
+    if (!list.getBoundingClientRect().height) {
+      continue;
+    }
+
+    const cards = Array.from(list.children, li => ({
+      li,
+      box: li.querySelector("calendar-event-box"),
+      top: parseFloat(li.style.insetBlockStart),
+      height: parseFloat(li.style.height),
+    })).filter(c => c.box && Number.isFinite(c.top) && Number.isFinite(c.height));
+
+    // Read phase: how much room each card's time and first title line take.
+    for (const card of cards) {
+      const label = card.box.querySelector(".event-name-label");
+      if (!label || rotated) {
+        card.need = 0;
+        card.lineHeight = 0;
+        card.labelTop = 0;
+        continue;
+      }
+      const style = view.getComputedStyle(label);
+      card.lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.25;
+      card.labelTop = label.getBoundingClientRect().top - card.box.getBoundingClientRect().top;
+      card.need = card.labelTop + card.lineHeight + 2;
+    }
+
+    const plan = rotated ? cards.map(() => ({ sideBySide: false, room: null })) : planCards(cards);
+
+    // Write phase.
+    cards.forEach((card, i) => {
+      const { sideBySide, room } = plan[i];
+      if (sideBySide !== card.li.hasAttribute(SAME_START_ATTR)) {
+        card.li.toggleAttribute(SAME_START_ATTR, sideBySide);
+      }
+
+      const { box } = card;
+      if (room === null) {
+        if (box.hasAttribute(CLAMP_ATTR)) {
+          box.removeAttribute(CLAMP_ATTR);
+          box.style.removeProperty(CLAMP_VAR);
+        }
+        return;
+      }
+      const lines = Math.max(1, Math.floor((room - card.labelTop - 2) / card.lineHeight));
+      if (box.style.getPropertyValue(CLAMP_VAR) !== String(lines)) {
+        box.style.setProperty(CLAMP_VAR, String(lines));
+      }
+      if (!box.hasAttribute(CLAMP_ATTR)) {
+        box.setAttribute(CLAMP_ATTR, "true");
+      }
+    });
+  }
+}
+
 function refresh(doc) {
-  markSameStart(doc);
   updateTimeLabels(doc);
   syncNowLine(doc);
+  layoutCards(doc);
 }
 
 function attach(window) {
@@ -193,6 +266,10 @@ function detach(window) {
   }
   for (const indicator of doc.querySelectorAll(`[${NOW_LINE_ATTR}]`)) {
     hideNowLine(indicator);
+  }
+  for (const box of doc.querySelectorAll(`[${CLAMP_ATTR}]`)) {
+    box.removeAttribute(CLAMP_ATTR);
+    box.style.removeProperty(CLAMP_VAR);
   }
 }
 

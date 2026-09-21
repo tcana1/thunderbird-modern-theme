@@ -409,8 +409,9 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
    (0%, 33.3%, 50%, ...), so the width is dropped and the offsets are remapped
    to fixed steps by matching the inline style. Unmatched offsets fall back to
    their own %, so nothing breaks, it just looks less tidy.
-   Events that start at the same time (marked data-same-start by the optional
-   calendar-ui-fixes extension) are left out and keep Thunderbird's own
+   Events that start at (almost) the same time, so that a later one would land
+   on the earlier one's text (marked data-same-start by the optional
+   calendar-ui-fixes extension), are left out and keep Thunderbird's own
    side-by-side split. */
 #calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem:not([data-same-start]) {
     --overlap-step: 14px;
@@ -495,4 +496,14 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
 
 #calendarContent .multiday-timebar-now-indicator {
     border-color: var(--now-line-color) !important;
+}
+
+/* Titles of cards that a later event starts on top of: the extension works out
+   how many lines fit above that event (--title-lines) and the title is cut there
+   with an ellipsis, so the two texts never run into each other. */
+#calendarContent calendar-event-box[data-clamp] .event-name-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--title-lines);
+    overflow: hidden;
 }

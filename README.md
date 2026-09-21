@@ -58,13 +58,14 @@ The **⋯** menu is where **Folder Modes**, **Show Message Count**, Show Folder 
 
 ## Optional: calendar-ui-fixes extension
 
-A tiny extension that does three things CSS can't, in the Day and Week views. Each one only adds an attribute or a small element, and `userChrome.css` does the styling:
+A tiny extension that does four things CSS can't, in the Day and Week views. Each one only adds an attribute or a small element, and `userChrome.css` does the styling:
 
-- Events that start at the same time are laid out **side by side** (the theme cascades the other overlaps).
+- Events that start at (almost) the same time, close enough that one would cover the other's text, are laid out **side by side** (the theme cascades the other overlaps).
 - Each event card shows its **time** ("14:00 – 18:00") above the title.
 - The "now" line is drawn **across the whole week**, not only in today's column.
+- When a later event starts on top of a card, its title is **cut with an ellipsis** just above it, so the texts don't overlap.
 
-Without the extension everything still works; you just don't get these three.
+Without the extension everything still works; you just don't get these.
 
 It uses a Thunderbird **Experiment API**, which needs no signing but is only allowed on some Thunderbird versions; the Thunderbird team has announced that Release will stop accepting Experiments (currently postponed).
 
