@@ -71,7 +71,8 @@ The **Section** column matches the numbered sections in `userChrome.css`. To und
 | Flat blue unread dot, replacing the green dot and the yellow "new" star; also on the conversation button | 5 | Delete the section |
 | Top toolbar in the same blue, with flat translucent buttons and search field; toolbar separator lines removed; macOS window buttons forced to the light scheme | 6 and 7 | Delete both sections together |
 | **"Unified Folders" title hidden** | 9 (first rule) | Delete that rule |
-| In Unified Folders, the **Trash** row and the **account** rows have no unread count and are never bold | 9 (other rules) | Delete those rules |
+| In Unified Folders, the **account** rows (and their non-standard folders, like "Later") are hidden, since All Folders already lists them | 9 (account rule) | Delete that rule |
+| In Unified Folders, the **Templates, Sent, Archives, Spam and Trash** rows have no unread count and are never bold | 9 (last two rules) | Delete those rules |
 | **"All Folders" pinned to the bottom** of the folder pane | 10 | Delete the section |
 | Message header: the sender is shown as **"From Name" on a single line**, with no avatar, and the From / To / Cc / Bcc names line up in a column. Overrides the *avatar* and *full address* options of Customize Header | 11 | Delete the section |
 | Calendar: "today", selection and drag highlights use the same blue as the unread dot (the sidebar keeps Thunderbird's default look) | 12 | Delete the section |

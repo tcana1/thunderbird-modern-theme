@@ -246,8 +246,9 @@ body:is(.layout-classic, .layout-vertical, .layout-wide, .account-central) {
 
 /* --------------------------------------------------------------------------
    9. Unified Folders
-      Hide the "Unified Folders" title. Trash and account rows get no unread
-      count and are never bold.
+      Hide the "Unified Folders" title and the account rows (with their
+      non-standard folders, which All Folders already shows). Templates, Sent,
+      Archives, Spam and Trash get no unread count and are never bold.
    -------------------------------------------------------------------------- */
 
 /* :not([hidden]) leaves Thunderbird's own hiding logic untouched */
@@ -255,13 +256,24 @@ li[data-mode="smart"] > .mode-container:not([hidden]) {
     display: none !important;
 }
 
-li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .unread-count,
-li[data-mode="smart"] > ul > li[data-server-type] > .container > .unread-count {
+/* account rows (Pessoal > Later, iCloud > Later, ...) duplicate All Folders */
+li[data-mode="smart"] > ul > li[data-server-type] {
     display: none !important;
 }
 
-li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name,
-li[data-mode="smart"] > ul > li[data-server-type] > .container > .name {
+li[data-mode="smart"] > ul > li[data-folder-type="templates"] > .container > .unread-count,
+li[data-mode="smart"] > ul > li[data-folder-type="sent"] > .container > .unread-count,
+li[data-mode="smart"] > ul > li[data-folder-type="archive"] > .container > .unread-count,
+li[data-mode="smart"] > ul > li[data-folder-type="junk"] > .container > .unread-count,
+li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .unread-count {
+    display: none !important;
+}
+
+li[data-mode="smart"] > ul > li[data-folder-type="templates"] > .container > .name,
+li[data-mode="smart"] > ul > li[data-folder-type="sent"] > .container > .name,
+li[data-mode="smart"] > ul > li[data-folder-type="archive"] > .container > .name,
+li[data-mode="smart"] > ul > li[data-folder-type="junk"] > .container > .name,
+li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
     font-weight: normal !important;
 }
 
