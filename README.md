@@ -56,6 +56,21 @@ The **⋯** menu is where **Folder Modes**, **Show Message Count**, Show Folder 
 3. Copy `userChrome.css` into `chrome/`.
 4. Make sure the requirements above are done and restart Thunderbird.
 
+## Optional: calendar-ui-fixes extension
+
+A tiny extension that does three things CSS can't, in the Day and Week views. Each one only adds an attribute or a small element, and `userChrome.css` does the styling:
+
+- Events that start at the same time are laid out **side by side** (the theme cascades the other overlaps).
+- Each event card shows its **time** ("14:00 – 18:00") above the title.
+- The "now" line is drawn **across the whole week**, not only in today's column.
+
+Without the extension everything still works; you just don't get these three.
+
+It uses a Thunderbird **Experiment API**, which needs no signing but is only allowed on some Thunderbird versions; the Thunderbird team has announced that Release will stop accepting Experiments (currently postponed).
+
+1. Build the package: `cd calendar-ui-fixes && zip -r ../calendar-ui-fixes.xpi . -x '.*'`
+2. In Thunderbird open **Tools → Add-ons and Themes**, click the gear, **Install Add-on From File…** and pick `calendar-ui-fixes.xpi`.
+
 ## Opinionated choices
 
 This is a set of personal preferences, so remove whatever you don't like.
@@ -78,6 +93,7 @@ The **Section** column matches the numbered sections in `userChrome.css`. To und
 | Calendar: "today", selection and drag highlights use the same blue as the unread dot (the sidebar keeps Thunderbird's default look) | 12 | Delete the section |
 | Calendar: events are translucent tints of the calendar color with a strong left bar; the "today" column is a faint blue wash with a thin rule under its heading | 12 | Delete those rules |
 | Calendar (Day / Week): overlapping events cascade on top of each other instead of sharing the column side by side | 12 (last rule) | Delete that rule |
+| Calendar (Day / Week): the event time sits above the title (with the extension), and the "now" line is a darker blue (across the whole week with the extension) | 12 (last rules) | Delete those rules |
 
 ## Customization
 
