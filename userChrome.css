@@ -361,7 +361,8 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
 
 /* --------------------------------------------------------------------------
    12. Calendar views (Day / Week / Multiweek / Month)
-       Accent color = --spark-blue; lines stay thin and light.
+       Accent color = --spark-blue; lines stay thin and light. Events are
+       translucent with a strong left bar; the "today" column is a faint wash.
    -------------------------------------------------------------------------- */
 
 #calendarContent {
@@ -374,5 +375,64 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
     --viewDayLabelSelectedBackground: var(--spark-blue);
     --viewDragboxBackground: var(--spark-blue);
     --viewDropshadowBackground: var(--spark-blue);
-    --viewHighlightBorderColor: color-mix(in srgb, var(--spark-blue) 70%, transparent);
+    --viewHighlightBorderColor: color-mix(in srgb, var(--spark-blue) 25%, transparent);
+
+    /* subtle "today" / selected column: a faint blue wash instead of a strong fill */
+    --viewTodayBackground: color-mix(in srgb, var(--spark-blue) 5%, var(--viewBackground));
+    --viewTodayOffBackground: color-mix(in srgb, var(--viewTodayBackground) 95%, black);
+    --viewDayBoxSelectedBackground: var(--viewTodayBackground);
+    --viewDayBoxOffSelectedBackground: var(--viewTodayOffBackground);
+}
+
+/* today's heading (Day / Week): thin blue rule under it */
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) .day-column-today .day-column-heading {
+    box-shadow: inset 0 -2px 0 var(--spark-blue);
+}
+
+/* Events: translucent tint of the calendar color, dark text, and a stronger
+   bar on the left. Selected events keep Thunderbird's own look. */
+#calendarContent :is(calendar-event-box, calendar-month-day-box-item).calendar-color-box:not([selected="true"]) {
+    background-color: color-mix(in srgb, var(--item-backcolor) 22%, transparent) !important;
+    color: var(--viewColor) !important;
+    border-radius: 3px;
+    box-shadow: inset 3px 0 0 var(--item-backcolor) !important;
+}
+
+#calendarContent .calendar-color-box:not([selected="true"]) .event-name-label {
+    font-weight: 500;
+}
+
+/* Overlapping events (Day / Week): instead of splitting the column into narrow
+   side-by-side strips, stack them as a cascade. Every card runs to the right
+   edge and later ones sit on top, shifted right by a small step.
+   Thunderbird sets width and inset-inline-start inline as % of the column
+   (0%, 33.3%, 50%, ...), so the width is dropped and the offsets are remapped
+   to fixed steps by matching the inline style. Unmatched offsets fall back to
+   their own %, so nothing breaks, it just looks less tidy. */
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem {
+    --overlap-step: 14px;
+    width: auto !important;
+    inset-inline-end: 0 !important;
+}
+
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem {
+    &[style*="inset-inline-start: 20%"],
+    &[style*="inset-inline-start: 25%"],
+    &[style*="inset-inline-start: 33."] {
+        inset-inline-start: var(--overlap-step) !important;
+    }
+    &[style*="inset-inline-start: 50%"] {
+        inset-inline-start: calc(var(--overlap-step) * 1.7) !important;
+    }
+    &[style*="inset-inline-start: 40%"],
+    &[style*="inset-inline-start: 66."] {
+        inset-inline-start: calc(var(--overlap-step) * 2) !important;
+    }
+    &[style*="inset-inline-start: 60%"],
+    &[style*="inset-inline-start: 75%"] {
+        inset-inline-start: calc(var(--overlap-step) * 3) !important;
+    }
+    &[style*="inset-inline-start: 80%"] {
+        inset-inline-start: calc(var(--overlap-step) * 4) !important;
+    }
 }
