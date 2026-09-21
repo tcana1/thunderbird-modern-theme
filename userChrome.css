@@ -345,3 +345,22 @@ li[data-mode="smart"] > ul > li[data-server-type] > .container > .name {
 #messageHeader :is(#fromHeading, #toHeading, #ccHeading, #bccHeading) {
     min-inline-size: 5ch !important;
 }
+
+
+/* --------------------------------------------------------------------------
+   12. Calendar views (Day / Week / Multiweek / Month)
+       Accent color = --spark-blue; lines stay thin and light.
+   -------------------------------------------------------------------------- */
+
+#calendarContent {
+    --selected-item-color: var(--spark-blue);
+    --selected-item-text-color: #ffffff;
+
+    --viewTodayLabelBackground: var(--spark-blue);
+    --viewTodayLabelColor: #ffffff;
+    --viewTodayDayLabelBackground: color-mix(in srgb, var(--spark-blue) 14%, transparent);
+    --viewDayLabelSelectedBackground: var(--spark-blue);
+    --viewDragboxBackground: var(--spark-blue);
+    --viewDropshadowBackground: var(--spark-blue);
+    --viewHighlightBorderColor: color-mix(in srgb, var(--spark-blue) 70%, transparent);
+}
