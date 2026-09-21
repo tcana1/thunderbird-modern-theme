@@ -76,6 +76,8 @@ The **Section** column matches the numbered sections in `userChrome.css`. To und
 | **"All Folders" pinned to the bottom** of the folder pane | 10 | Delete the section |
 | Message header: the sender is shown as **"From Name" on a single line**, with no avatar, and the From / To / Cc / Bcc names line up in a column. Overrides the *avatar* and *full address* options of Customize Header | 11 | Delete the section |
 | Calendar: "today", selection and drag highlights use the same blue as the unread dot (the sidebar keeps Thunderbird's default look) | 12 | Delete the section |
+| Calendar: events are translucent tints of the calendar color with a strong left bar; the "today" column is a faint blue wash with a thin rule under its heading | 12 | Delete those rules |
+| Calendar (Day / Week): overlapping events cascade on top of each other instead of sharing the column side by side | 12 (last rule) | Delete that rule |
 
 ## Customization
 
