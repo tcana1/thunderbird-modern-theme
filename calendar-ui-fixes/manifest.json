@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Calendar UI Fixes",
+  "version": "0.2.1",
+  "description": "Companion to the Thunderbird Modern Theme: side-by-side same-start events, event times and a week-wide now line in the calendar.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "calendar-ui-fixes@tcanabarro",
+      "strict_min_version": "128.0"
+    }
+  },
+  "experiment_apis": {
+    "calendarUIFixes": {
+      "schema": "schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "paths": [["calendarUIFixes"]],
+        "script": "implementation.js",
+        "events": ["startup"]
+      }
+    }
+  }
+}

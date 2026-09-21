@@ -408,14 +408,17 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
    Thunderbird sets width and inset-inline-start inline as % of the column
    (0%, 33.3%, 50%, ...), so the width is dropped and the offsets are remapped
    to fixed steps by matching the inline style. Unmatched offsets fall back to
-   their own %, so nothing breaks, it just looks less tidy. */
-#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem {
+   their own %, so nothing breaks, it just looks less tidy.
+   Events that start at the same time (marked data-same-start by the optional
+   calendar-ui-fixes extension) are left out and keep Thunderbird's own
+   side-by-side split. */
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem:not([data-same-start]) {
     --overlap-step: 14px;
     width: auto !important;
     inset-inline-end: 0 !important;
 }
 
-#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem {
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) calendar-event-column .multiday-event-listitem:not([data-same-start]) {
     &[style*="inset-inline-start: 20%"],
     &[style*="inset-inline-start: 25%"],
     &[style*="inset-inline-start: 33."] {
@@ -435,4 +438,61 @@ li[data-mode="smart"] > ul > li[data-folder-type="trash"] > .container > .name {
     &[style*="inset-inline-start: 80%"] {
         inset-inline-start: calc(var(--overlap-step) * 4) !important;
     }
+}
+
+/* Event time (Day / Week), added by the optional calendar-ui-fixes extension:
+   "14:00 – 18:00" in a muted color above the title. On short cards it sits on
+   the same line as the title instead. */
+#calendarContent calendar-event-box .calendar-item-container {
+    display: flex !important;
+    flex-direction: column;
+}
+
+#calendarContent calendar-event-box .ui-fixes-time {
+    flex: 0 0 auto;
+    padding: 4px 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+#calendarContent calendar-event-box .ui-fixes-time:empty {
+    display: none;
+}
+
+#calendarContent calendar-event-box .ui-fixes-time + .calendar-item-flex {
+    padding-block-start: 1px;
+}
+
+#calendarContent calendar-event-box .calendar-item-container[data-short] {
+    flex-direction: row;
+    align-items: baseline;
+}
+
+#calendarContent calendar-event-box .calendar-item-container[data-short] .ui-fixes-time {
+    padding-block-end: 4px;
+}
+
+#calendarContent calendar-event-box .calendar-item-container[data-short] .ui-fixes-time + .calendar-item-flex {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    padding-block-start: 4px;
+    padding-inline-start: 0;
+}
+
+/* "Now" line: a darker blue, drawn across the whole week (the extension repeats
+   Thunderbird's bar, which only exists in today's column, in the other columns).
+   Without the extension it is simply blue and only in today's column. */
+#calendarContent {
+    --now-line-color: color-mix(in srgb, var(--spark-blue) 70%, black);
+}
+
+#calendarContent .multiday-grid:not(.multiday-grid-rotated) .timeIndicator {
+    opacity: 1 !important;
+    border-block-start: 2px solid var(--now-line-color) !important;
+}
+
+#calendarContent .multiday-timebar-now-indicator {
+    border-color: var(--now-line-color) !important;
 }
