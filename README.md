@@ -74,6 +74,7 @@ The **Section** column matches the numbered sections in `userChrome.css`. To und
 | In Unified Folders, the **Trash** row and the **account** rows have no unread count and are never bold | 9 (other rules) | Delete those rules |
 | **"All Folders" pinned to the bottom** of the folder pane | 10 | Delete the section |
 | Message header: the sender is shown as **"From Name" on a single line**, with no avatar, and the From / To / Cc / Bcc names line up in a column. Overrides the *avatar* and *full address* options of Customize Header | 11 | Delete the section |
+| Calendar: "today", selection and drag highlights use the same blue as the unread dot (the sidebar keeps Thunderbird's default look) | 12 | Delete the section |
 
 ## Customization
 
